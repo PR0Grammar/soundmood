@@ -15,7 +15,7 @@
 // # Initialize the Soundcloud API client with our client ID
 //
 SC.initialize({
-  client_id: 'TODO: Replace this with your client_id'
+  client_id: '5d1d2fcc056a6995a2764b74ece0b033'
 });
 
 
@@ -32,6 +32,8 @@ SC.initialize({
 //
 $(document).ready(function() {
   // Add click handlers to 'go' and 'random' buttons here.
+  goClicked();
+  randomClicked();
 });
 
 
@@ -49,7 +51,11 @@ $(document).ready(function() {
 // 3. Update jumbotron #moodstatus to dipsplay the mood
 //
 function goClicked() {
-  // TODO: fill this out
+  $("#go").click(function(){
+    var usersMood=$("#mood").val();
+    searchTracks(usersMood);
+    updateJumboTron(usersMood);
+  });
 }
 
 //
@@ -63,7 +69,12 @@ function goClicked() {
 // * **mood**, the user's mood.
 //
 function searchTracks(mood) {
-  // TODO: fill this out
+  SC.get('/tracks', {q:mood}).then(function(tracks){
+      for(var i=0; i<tracks.length ; i++){
+        var randTrack=tracks[Math.floor(Math.random()*i)].id;
+      }
+        playTrack(randTrack);
+      });
 }
 
 //
@@ -79,9 +90,19 @@ function searchTracks(mood) {
 var currentSong = null; // The song that is currently playing
 function playTrack(trackid) {
   if (currentSong != null) {
-    // TODO: stop the current song
+    currentSong.pause();
+    currentSong=null;
+
   }
   // TODO: stream the track based on the given id and update 'currentSong'.
+  else{
+
+    SC.stream('/tracks/' + trackid).then(function(player) {
+      player.play();
+      currentSong=player
+      console.log(currentSong);
+    });
+  }
 }
 
 //
@@ -111,6 +132,10 @@ function updateJumboTron(mood) {
 //
 function randomClicked() {
   // TODO: fill this out
+  $("#random").click(function(){
+      searchTracks(randomMood());
+      updateJumboTron(randomMood());
+  });
 }
 
 //
@@ -119,9 +144,10 @@ function randomClicked() {
 // Returns a random mood from moodList.
 //
 // TODO: add moods to this list
-var moodList = [];
+var moodList = ["Happy", "Sad", "Angry", "Tired"];
 function randomMood() {
-  // TODO: fill this out
+  var randNumb=Math.floor(Math.random()*moodList.length);
+  return moodList[randNumb];
 }
 
 
